@@ -89,7 +89,7 @@ int main()
 void results(struct sportsmen sport[],int size) {
 	setlocale(LC_ALL, "rus");
 	
-	for (int i = 1; i < 7; i++) {
+	for (int i = 1; i < size+1; i++) {
 		printf("\n\n");
 		for (int j = 0; j < 7; j++) {
 			if (j == 0) {
