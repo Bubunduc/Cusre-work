@@ -28,7 +28,7 @@ int main()
 	char  extension[6] = { ".txt\0" };
 	char file_name[40];
 	puts("Введите название файла в пределах 30 символов (без указания расширения файла)");
-	gets(file_name);//Чтобы имена спортсменов корректно считались необходимо сменить кодировку с UTF-8 на ANCII
+	gets(file_name);//Чтобы имена спортсменов корректно считались необходимо сменить кодировку с UTF-8 на ANSI
 	strcat(file_name, extension);
 	printf("Имя файла: %s\n",file_name);
 	int what_do = 0; int size = 0;
