@@ -89,15 +89,15 @@ int main()
 void results(struct sportsmen sport[],int size) {
 	setlocale(LC_ALL, "rus");
 	
-	for (int i = 1; i < size+1; i++) {
+	for (int i = 1; i < size+2; i++) {
 		printf("\n\n");
 		for (int j = 0; j < 7; j++) {
 			if (j == 0) {
-				printf("%1d %5s ", i, sport[i].full_name);
+				printf("%1d %5s ", i, sport[i-1].full_name);
 			}
 			else
 			{
-				printf("%5.2f ", sport[i].results[j-1]);
+				printf("%5.2f ", sport[i-1].results[j-1]);
 			}
 		}
 	}
