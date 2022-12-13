@@ -4,18 +4,18 @@
 #include <string.h>
 #include <io.h>
 #pragma warning(disable:4996)
-
+struct sportsmen {
+	char full_name[60];
+	float results[6];
+	float maximum;
+};
 void results(int size, struct sportsmen sport[]);
 void winners(int size, struct sportsmen sport[]);
 float kicked(int size, struct sportsmen sport[]);
 float average(int size, struct sportsmen sport[]);
 float local_maximum(struct  sportsmen sportsmen);
 void sort(int size, struct sportsmen sport[]);
-struct sportsmen {
-	char full_name[60];
-	float results[6];
-	float maximum;
-};
+
 
 int main()
 {
