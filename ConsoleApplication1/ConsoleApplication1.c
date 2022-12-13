@@ -5,17 +5,16 @@
 #include <io.h>
 #pragma warning(disable:4996)
 
-void results();
-void winners();
-float kicked();
-float average();
-float local_maximum();
-float local_minimum();
-void sort();
+void results(int size, struct sportsmen sport[]);
+void winners(int size, struct sportsmen sport[]);
+float kicked(int size, struct sportsmen sport[]);
+float average(int size, struct sportsmen sport[]);
+float local_maximum(struct  sportsmen sportsmen);
+void sort(int size, struct sportsmen sport[]);
 struct sportsmen {
 	char full_name[60];
 	float results[6];
-	float minimum;
+	float maximum;
 };
 
 int main()
@@ -24,14 +23,18 @@ int main()
 	struct sportsmen* sportsmens;
 
 	setlocale(LC_ALL, "rus");
+
 	puts("Толкание ядра");
+
 	char  extension[6] = { ".txt\0" };
 	char file_name[40];
 	puts("Введите название файла в пределах 30 символов (без указания расширения файла)");
+
 	gets(file_name);//Чтобы имена спортсменов корректно считались необходимо сменить кодировку с UTF-8 на ANCII
 	strcat(file_name, extension);
 	printf("Имя файла: %s\n", file_name);
 	int what_do = 0; int size = 0;
+
 	FILE* table;
 	table = fopen(file_name, "rt");
 	if (table == NULL) {
@@ -45,6 +48,7 @@ int main()
 	}
 	fclose(table);
 	table = fopen(file_name, "rt");
+
 	sportsmens = (struct sportsmen*)malloc(size * sizeof(struct sportsmen));
 
 
@@ -57,6 +61,8 @@ int main()
 		fscanf(table, " %5f ", &sportsmens[i].results[4]);
 		fscanf(table, " %5f\n", &sportsmens[i].results[5]);
 	}
+	
+	
 	int is_sorted = 0;
 
 	while (what_do != 5) {
@@ -72,7 +78,7 @@ int main()
 		case 1: {
 			puts("Результаты спортсменов,Каждая строка - это результаты спортсмена за 6 попыток");
 			
-			results(sportsmens, size);
+			results(size, sportsmens);
 			break;
 		}
 		case 2:  winners(size, sportsmens); break;
@@ -82,7 +88,7 @@ int main()
 			printf("Среднее арифметическое из всех рузультатов спортсменов %5.2f\n", averag);
 			break;
 		}
-		case 5: puts("Выход совершен успешно!"); break;
+		case 5: puts("Выход совершен успешно!"); free(sportsmens); break;
 		case 6: system("cls"); puts("Очистка прошла успешно!"); break;
 		default:
 			printf("Неизвестная программа");
@@ -95,30 +101,21 @@ int main()
 float local_maximum(struct  sportsmen sportsmen)
 {
 	float max = 0.0;
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (sportsmen.results[i] > max) {
 			max = sportsmen.results[i];
 		}
 	}
 	return max;
 }
-float local_minimum(struct  sportsmen sportsmen) {
-	float min = 999.0;
-	for (int i = 0; i < 4; i++) {
-		if (sportsmen.results[i] < min) {
-			min = sportsmen.results[i];
-		}
-	}
-	return min;
-}
 void sort(int size, struct sportsmen sport[]) {
 	setlocale(LC_ALL, "rus");
 	for (int i = 0; i < size + 1; i++) {
-		sport[i].minimum = local_minimum(sport[i]);
+		sport[i].maximum = local_maximum(sport[i]);
 	}
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size - i; j++) {
-			if (sport[j + 1].minimum > sport[j].minimum) {
+			if (sport[j + 1].maximum > sport[j].maximum) {
 				struct sportsmen buffer = sport[j + 1];
 				sport[j + 1] = sport[j];
 				sport[j] = buffer;
@@ -127,7 +124,7 @@ void sort(int size, struct sportsmen sport[]) {
 	}
 
 }
-void results(struct sportsmen sport[], int size) {
+void results(int size, struct sportsmen sport[]) {
 	setlocale(LC_ALL, "rus");
 
 	for (int i = 1; i < size + 2; i++) {
@@ -142,7 +139,7 @@ void results(struct sportsmen sport[], int size) {
 			}
 		}
 	}
-
+	printf("\n\n");
 }
 void winners(int size, struct sportsmen sport[]) {
 	float* maximums;
@@ -179,16 +176,27 @@ void winners(int size, struct sportsmen sport[]) {
 	winners_score[2] = max_3;
 	printf("Победители:\n");
 	for (int i = 1; i < 4; i++) {
-		printf("%d место: %s с результатом %5.2f\n", i, sport[winner_index[i - 1]], winners_score[i - 1]);
+		printf("%d место: %s с результатом %5.2f\n", i, sport[winner_index[i - 1]].full_name, winners_score[i - 1]);
 	}
 	free(maximums);
 }
 
 float kicked(int size, struct sportsmen sport[]) {
-	puts("Проигравшие(Набравшие наихудшие результаты за 3 попытки)");
+	puts("Проигравшие(Набравшие наихудшие результаты за первые 3 попытки)");
 	for (int i = 8; i < size + 1; i++) {
-		printf("%2d %s %5.2f\n",i+1,sport[i].full_name,sport[i].minimum);
+		printf("\n\n");
+		for (int j = 0; j < 7; j++) {
+			if (j == 0) {
+				printf("%1d %5s ", i+1, sport[i].full_name);
+			}
+			else
+			{
+				printf("%5.2f ", sport[i].results[j]);
+			}
+		}
+		
 	}
+	printf("\n");
 	
 }
 float average(int size, struct sportsmen sport[]) {
@@ -202,3 +210,4 @@ float average(int size, struct sportsmen sport[]) {
 	average = summ / ((float)size * 6.0);
 	return average;
 }
+
