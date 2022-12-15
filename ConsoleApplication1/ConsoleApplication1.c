@@ -5,11 +5,7 @@
 #include <io.h>
 #pragma warning(disable:4996)
 #define SIZE   10;
-struct sportsmen {
-	char full_name[60];
-	float results[6];
-	float maximum;
-};
+
 float local_maximum(float scores[], int diap);
 void sort(int size, char names[10][40], float scores[10][7]);
 void results(int size, char names[10][40], float scores[10][7]);
@@ -22,7 +18,7 @@ float average(int size, float scores[10][7]);
 int main()
 {
 
-	struct sportsmen* sportsmens;
+	
 
 	setlocale(LC_ALL, "rus");
 
