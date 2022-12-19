@@ -43,38 +43,46 @@ int main()
 
 	float scores[SIZE][lEN_SCORE];
 	char names[SIZE][LEN_NAME];
+	float original_scores[SIZE][lEN_SCORE];
+	char original_names[SIZE][LEN_NAME];
 	file_read(file_name, names, scores);
-
+	file_read(file_name, original_names, original_scores);
 
 
 	int is_sorted = 0;
 
-	while (what_do != 5) {
+	while (what_do != 6) {
 		if (is_sorted == 0) {
 			sort(SIZE, names, scores);
 			is_sorted += 1;
 		}
-		puts("Толкание ядра");
-		printf("\nВот что может программа:\n1)Вывести таблицу результатов;\n2)Вывести список победителей;\n3)Вывести выбывших игроков\n4)Показать средний арифметический результат\n5)Выйти из программы\n6)Очистить консоль\n");
+		printf("Толкание ядра\n");
+		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Выйти из программы\n7)Очистить консоль\n");
 
 		scanf_s("%d", &what_do);
 		switch (what_do)
 		{
 		case 1: {
-			puts("Результаты спортсменов,Каждая строка - это результаты спортсмена за 6 попыток");
+			printf("Результаты спортсменов,Каждая строка - это результаты спортсмена за 6 попыток\n\n");
+
+			results(SIZE, original_names, original_scores);
+			break;
+		}
+		case 2: {
+			printf("Результаты спортсменов,Каждая строка - это результаты спортсмена за 6 попыток\n\n");
 
 			results(SIZE, names, scores);
 			break;
 		}
-		case 2:  winners(SIZE, names, scores); break;
-		case 3:  kicked(SIZE, names, scores); break;
-		case 4: {
+		case 3:  winners(SIZE, names, scores); break;
+		case 4:  kicked(SIZE, names, scores); break;
+		case 5: {
 
-			printf("Среднее арифметическое из всех рузультатов спортсменов %5.2f\n", average(SIZE, scores));
+			printf("\nСреднее арифметическое из всех рузультатов спортсменов %5.2f\n\n", average(SIZE, scores));
 			break;
 		}
-		case 5: puts("Выход совершен успешно!"); return 0;
-		case 6: system("cls"); puts("Очистка прошла успешно!"); break;
+		case 6: puts("Выход совершен успешно!"); return 0;
+		case 7: system("cls"); puts("Очистка прошла успешно!"); break;
 		default:
 			printf("Неизвестная программа");
 			break;
@@ -112,6 +120,7 @@ int file_read(char filename[LEN_FILENAME], char names[SIZE][LEN_NAME], float sco
 		fscanf(table, " %5f\n", &scores[i][5]);
 
 	}
+	fclose(table);
 	return 1;
 }
 float local_maximum(float scores[], int diap)
@@ -160,14 +169,14 @@ void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
 }
 void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
 	setlocale(LC_ALL, "rus");
-
+	printf("Номер      Имя         Попытка 1    Попытка 2   Попытка 3   Попытка 4   Попытка 5   Попытка 6");
 	for (int i = 0; i < size; i++) {
-		printf("\n");
+		printf("\n\n");
 		for (int j = 0; j < LAST_RESULT; j++) {
 			if (j == 0) {
-				printf("%2d %1s ", i + 1, names[i]);
+				printf("%2d %15s  ", i + 1, names[i]);
 			}
-			printf(" %5.2f ", scores[i][j]);
+			printf(" %10.2f ", scores[i][j]);
 		}
 	}
 
@@ -217,26 +226,27 @@ void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]
 	int max_3 = found_max(maximums, 3);
 	int max_indexes[3] = { max_1,max_2,max_3 };
 	
-	printf("Победители:\n");
+	printf("Победители:\n\n");
 	for (int i = 1; i < 4; i++) {
-		printf("%d место: %s с результатом %5.2f\n", i, names[max_indexes[i-1]], maximums[max_indexes[i - 1]]);
+		printf("%d место: %s с результатом %5.2f\n\n", i, names[max_indexes[i-1]], maximums[max_indexes[i - 1]]);
 	}
 	free(maximums);
 }
 
 float kicked(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
-	puts("Проигравшие(Набравшие наихудшие результаты за первые 3 попытки)");
+	puts("Проигравшие(Набравшие наихудшие результаты за первые 3 попытки)\n");
+	printf("Номер      Имя         Попытка 1    Попытка 2   Попытка 3   Попытка 4   Попытка 5   Попытка 6");
 	for (int i = KICK_RANGE; i < size; i++) {
 		printf("\n\n");
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < LAST_RESULT; j++) {
 			if (j == 0) {
-				printf("%d %s ", i + 1, names[i]);
+				printf("%2d %15s  ", i + 1, names[i]);
 			}
-			printf(" %5.2f", scores[i][j]);
+			printf(" %10.2f ", scores[i][j]);
 		}
 
 	}
-	printf("\n");
+	printf("\n\n");
 	return 0.0;
 
 }
@@ -252,5 +262,6 @@ float average(int size, float scores[SIZE][lEN_SCORE]) {
 	average = summ / ((float)size * LAST_RESULT);
 	return average;
 }
+
 
 
