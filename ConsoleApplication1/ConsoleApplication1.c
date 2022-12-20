@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
+#include <windows.h>
 #pragma warning(disable:4996)
 #define SIZE   10
 #define LEN_NAME 40
@@ -20,17 +21,14 @@ int found_max(float maxes[], int number);
 void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
 float kicked(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
 float average(int size, float scores[SIZE][lEN_SCORE]);
-
-
+int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][lEN_SCORE], char name[LEN_NAME]);
 
 int main()
 {
 
-
-
 	setlocale(LC_ALL, "rus");
-
-
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 
 	char  extension[6] = { ".txt\0" };
 	char file_name[LEN_FILENAME];
@@ -51,13 +49,13 @@ int main()
 
 	int is_sorted = 0;
 
-	while (what_do != 6) {
+	while (what_do != 8) {
 		if (is_sorted == 0) {
 			sort(SIZE, names, scores);
 			is_sorted += 1;
 		}
 		printf("Толкание ядра\n");
-		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Выйти из программы\n7)Очистить консоль\n");
+		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Изменить значения у одного из спортсменов\n7)Очистить консоль\n8)Выйти из программы\n");
 
 		scanf_s("%d", &what_do);
 		switch (what_do)
@@ -81,10 +79,18 @@ int main()
 			printf("\nСреднее арифметическое из всех рузультатов спортсменов %5.2f\n\n", average(SIZE, scores));
 			break;
 		}
-		case 6: puts("Выход совершен успешно!"); return 0;
+		case 6: {
+			
+			char name[LEN_NAME];
+			printf("Введите имя нужного спортсмена : \n");
+			scanf_s("%s", name,LEN_NAME);
+			reduct(SIZE, names, scores, original_names, original_scores, name); 
+			break;
+		}
 		case 7: system("cls"); puts("Очистка прошла успешно!"); break;
+		case 8:puts("Выход совершен успешно!"); return 0;
 		default:
-			printf("Неизвестная программа");
+			printf("Неизвестная программа\n\n");
 			break;
 		}
 	}
@@ -262,6 +268,30 @@ float average(int size, float scores[SIZE][lEN_SCORE]) {
 	average = summ / ((float)size * LAST_RESULT);
 	return average;
 }
-
-
-
+int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][lEN_SCORE],char name[LEN_NAME]) {
+	setlocale(LC_ALL, "rus");
+	for (int i = 0; i < size; i++) {
+		strcpy(names[i],original_names[i]);
+		for (int j = 0; j<LAST_RESULT; j++) {
+			scores[i][j] = original_scores[i][j];
+		}
+	}
+	for (int i = 0; i < size; i++) {
+		if (strcmp(names[i], name) == 0) {
+			printf("%s найден\n\n", name);
+			
+			for (int value = 0; value < LAST_RESULT; value++) {
+				printf("Введите значение %d  ", value + 1);
+				float new_value;
+				scanf_s("%f", &new_value);
+				printf("\n");
+				scores[i][value] = new_value;
+			}
+			sort(SIZE, names, scores);
+			return 1;
+		}
+			
+	}
+	sort(SIZE, names, scores);
+	printf("Ничего не найдено\n\n");
+}
