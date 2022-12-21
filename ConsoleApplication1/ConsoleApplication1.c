@@ -7,22 +7,23 @@
 #pragma warning(disable:4996)
 #define SIZE   10
 #define LEN_NAME 40
-#define lEN_SCORE 7
+#define LEN_SCORE 7
 #define LEN_FILENAME 40
 #define KICK_RANGE 8 
 #define RESULTS_DEL1 3
 #define RESULTS_DEL2 7
 #define LAST_RESULT 6
-int file_read(char name[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
+#define PLACES 3
+int file_read(char name[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
 float local_maximum(float scores[], int diap);
-void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
-void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
+void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
+void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
 int found_max(float maxes[], int number);
-void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
-float kicked(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]);
-float average(int size, float scores[SIZE][lEN_SCORE]);
-int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][lEN_SCORE], char name[LEN_NAME]);
-
+void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE],int places[PLACES]);
+float average(int size, float scores[SIZE][LEN_SCORE]);
+int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][LEN_SCORE], char name[LEN_NAME]);
+int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
+float local_minimum(float scores[]);
 int main()
 {
 
@@ -39,9 +40,9 @@ int main()
 	printf("Имя файла: %s\n", file_name);
 	int what_do = 0;
 
-	float scores[SIZE][lEN_SCORE];
+	float scores[SIZE][LEN_SCORE];
 	char names[SIZE][LEN_NAME];
-	float original_scores[SIZE][lEN_SCORE];
+	float original_scores[SIZE][LEN_SCORE];
 	char original_names[SIZE][LEN_NAME];
 	file_read(file_name, names, scores);
 	file_read(file_name, original_names, original_scores);
@@ -49,13 +50,13 @@ int main()
 
 	int is_sorted = 0;
 
-	while (what_do != 8) {
+	while (what_do != 9) {
 		if (is_sorted == 0) {
 			sort(SIZE, names, scores);
 			is_sorted += 1;
 		}
 		printf("Толкание ядра\n");
-		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Изменить значения у одного из спортсменов\n7)Очистить консоль\n8)Выйти из программы\n");
+		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Изменить значения у одного из спортсменов\n7)Очистить консоль\n8)Показать наихудший среди всех результат\n9)Выйти из программы\n");
 
 		scanf_s("%d", &what_do);
 		switch (what_do)
@@ -72,23 +73,57 @@ int main()
 			results(SIZE, names, scores);
 			break;
 		}
-		case 3:  winners(SIZE, names, scores); break;
-		case 4:  kicked(SIZE, names, scores); break;
+		
+		case 3: {
+			int places[PLACES];
+			winners(SIZE, names, scores  ,places);
+			printf("Победители, при поиске в изначальном массиве:\n\n");
+			for (int i = 0; i < PLACES; i++) {
+				printf("%d место: %s с индексом %d и наибольшим значением %5.2f\n\n", i+1, names[places[i]],places[i], local_maximum(scores[places[i]],6));
+			}
+			break;
+		}
+		case 4: { 
+			puts("Проигравшие(Набравшие наихудшие результаты за первые 3 попытки)\n");
+			printf("Номер      Имя         Попытка 1    Попытка 2   Попытка 3   Попытка 4   Попытка 5   Попытка 6");
+			for (int i = KICK_RANGE; i < SIZE; i++) {
+				printf("\n\n");
+				for (int j = 0; j < LAST_RESULT; j++) {
+					if (j == 0) {
+						printf("%2d %15s  ", i + 1, names[i]);
+					}
+					printf(" %10.2f ", scores[i][j]);
+				}
+
+			}
+			printf("\n\n");
+			
+		}
+			  break;
 		case 5: {
 
 			printf("\nСреднее арифметическое из всех рузультатов спортсменов %5.2f\n\n", average(SIZE, scores));
 			break;
 		}
 		case 6: {
-			
+			int flag;
 			char name[LEN_NAME];
 			printf("Введите имя нужного спортсмена : \n");
 			scanf_s("%s", name,LEN_NAME);
-			reduct(SIZE, names, scores, original_names, original_scores, name); 
+			flag = reduct(SIZE, names, scores, original_names, original_scores, name);
+			if (flag == 0) {
+				printf("По запросу %s ничего не найдено\n\n", name);
+			}
 			break;
 		}
 		case 7: system("cls"); puts("Очистка прошла успешно!"); break;
-		case 8:puts("Выход совершен успешно!"); return 0;
+		case 8: {
+			int lowest;
+			lowest = minimum(SIZE, names, scores);
+			printf("Наихудший результат принадлежит игроку %s под индексом %d\nОн равен: %5.2f\n\n",names[lowest],lowest,local_minimum(scores[lowest]));
+			break;
+		}
+		case 9:puts("Выход совершен успешно!"); return 0;
 		default:
 			printf("Неизвестная программа\n\n");
 			break;
@@ -96,7 +131,7 @@ int main()
 	}
 }
 
-int file_read(char filename[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
+int file_read(char filename[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
 	FILE* table;
 	table = fopen(filename, "rt");
 	if (table == NULL) {
@@ -131,7 +166,7 @@ int file_read(char filename[LEN_FILENAME], char names[SIZE][LEN_NAME], float sco
 }
 float local_maximum(float scores[], int diap)
 {
-	float max = 0.0;
+	float max = scores[0];
 	
 	for (int i = 0; i < diap; i++) {
 		if (scores[i] > max) {
@@ -140,7 +175,7 @@ float local_maximum(float scores[], int diap)
 	}
 	return max;
 }
-void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
+void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
 	setlocale(LC_ALL, "rus");
 
 	for (int i = 0; i < size; i++) {
@@ -154,8 +189,8 @@ void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
 				max_index = j;
 			}
 		}
-		float buffer[lEN_SCORE];
-		for (int buff = 0; buff < lEN_SCORE; buff++) {
+		float buffer[LEN_SCORE];
+		for (int buff = 0; buff < LEN_SCORE; buff++) {
 			buffer[buff] = scores[max_index][buff];
 			scores[max_index][buff] = scores[i][buff];
 			scores[i][buff] = buffer[buff];
@@ -173,7 +208,7 @@ void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
 	}
 
 }
-void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
+void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
 	setlocale(LC_ALL, "rus");
 	printf("Номер      Имя         Попытка 1    Попытка 2   Попытка 3   Попытка 4   Попытка 5   Попытка 6");
 	for (int i = 0; i < size; i++) {
@@ -190,7 +225,7 @@ void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]
 }
 int found_max(float maxes[],int number) {
 	float max = 0.0;
-	int max_index = 0;
+	int max_index = maxes[0];
 	float past_max = 0 ;
 	int past_max_index = 0;
 	for (int past = 0; past < SIZE; past++) {
@@ -203,7 +238,7 @@ int found_max(float maxes[],int number) {
 		return past_max_index;
 	}
 	for (int i = 0; i < number-1; i++) {
-		max = maxes[max_index];
+		
 		
 		for (int j = 0; j < SIZE; j++) {
 
@@ -214,49 +249,26 @@ int found_max(float maxes[],int number) {
 				
 			}
 		}
-	if (i == number - 1) {
+	if (i == number-1 ) {
 		return max_index;
 	}
 	}
 }
-void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
+void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE],int places[PLACES]) {
 	float* maximums;
 	maximums = (float*)malloc(size * sizeof(float));
 	float winners_score[3];
 	int winner_index[3];
 	for (int i = 0; i < SIZE; i++) {
-		maximums[i] = local_maximum(scores[i], 7);
+		maximums[i] = local_maximum(scores[i], LAST_RESULT);
 	}
-	int max_1 = found_max(maximums,1);
-	int max_2 = found_max(maximums, 2);
-	int max_3 = found_max(maximums, 3);
-	int max_indexes[3] = { max_1,max_2,max_3 };
 	
-	printf("Победители:\n\n");
-	for (int i = 1; i < 4; i++) {
-		printf("%d место: %s с результатом %5.2f\n\n", i, names[max_indexes[i-1]], maximums[max_indexes[i - 1]]);
+	for (int place = 0; place < PLACES;place++) {
+		places[place] = found_max(maximums, place + 1);
 	}
 	free(maximums);
 }
-
-float kicked(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE]) {
-	puts("Проигравшие(Набравшие наихудшие результаты за первые 3 попытки)\n");
-	printf("Номер      Имя         Попытка 1    Попытка 2   Попытка 3   Попытка 4   Попытка 5   Попытка 6");
-	for (int i = KICK_RANGE; i < size; i++) {
-		printf("\n\n");
-		for (int j = 0; j < LAST_RESULT; j++) {
-			if (j == 0) {
-				printf("%2d %15s  ", i + 1, names[i]);
-			}
-			printf(" %10.2f ", scores[i][j]);
-		}
-
-	}
-	printf("\n\n");
-	return 0.0;
-
-}
-float average(int size, float scores[SIZE][lEN_SCORE]) {
+float average(int size, float scores[SIZE][LEN_SCORE]) {
 	float summ = 0.0;
 	float average = 0.0;
 
@@ -268,7 +280,7 @@ float average(int size, float scores[SIZE][lEN_SCORE]) {
 	average = summ / ((float)size * LAST_RESULT);
 	return average;
 }
-int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][lEN_SCORE],char name[LEN_NAME]) {
+int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][LEN_SCORE],char name[LEN_NAME]) {
 	setlocale(LC_ALL, "rus");
 	for (int i = 0; i < size; i++) {
 		strcpy(names[i],original_names[i]);
@@ -292,6 +304,28 @@ int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][lEN_SCORE], 
 		}
 			
 	}
-	sort(SIZE, names, scores);
-	printf("Ничего не найдено\n\n");
+	return 0;
+}
+int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
+	int min_index;
+	float minimum = 9999.0;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < LEN_SCORE; j++) {
+			if (scores[i][j] < minimum) {
+				minimum = scores[i][j];
+				min_index = i;
+			}
+		}
+	}
+	return min_index;
+}
+float local_minimum(float scores[]) {
+	float min = scores[0];
+
+	for (int i = 0; i < RESULTS_DEL1; i++) {
+		if (scores[i] < min) {
+			min = scores[i];
+		}
+	}
+	return min;
 }
