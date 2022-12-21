@@ -31,7 +31,7 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	char  extension[6] = { ".txt\0" };
+	char  extension[6] = { ".txt" };
 	char file_name[LEN_FILENAME];
 	puts("Введите название файла в пределах 30 символов (без указания расширения файла)");
 
