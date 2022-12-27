@@ -14,7 +14,7 @@
 #define RESULTS_DEL2 7
 #define LAST_RESULT 6
 #define PLACES 3
-int file_read(char name[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
+int file_read(char filename[LEN_FILENAME], char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
 float local_maximum(float scores[], int diap);
 void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
 void results(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
@@ -179,7 +179,7 @@ void sort(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
 	setlocale(LC_ALL, "rus");
 
 	for (int i = 0; i < size; i++) {
-		scores[i][LAST_RESULT] = local_maximum(scores[i], 3);
+		scores[i][LAST_RESULT] = local_maximum(scores[i], RESULTS_DEL1);
 	}
 	int max_index = 0;
 	for (int i = 0; i < size; i++) {
@@ -308,7 +308,7 @@ int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE], 
 }
 int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
 	int min_index;
-	float minimum = 9999.0;
+	float minimum = scores[0][0];
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < LEN_SCORE; j++) {
 			if (scores[i][j] < minimum) {
@@ -322,8 +322,8 @@ int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE])
 float local_minimum(float scores[]) {
 	float min = scores[0];
 
-	for (int i = 0; i < RESULTS_DEL1; i++) {
-		if (scores[i] < min) {
+	for (int i = 0; i < LAST_RESULT; i++) {
+		if ((scores[i] < min)&&(scores[i]!=0)) {
 			min = scores[i];
 		}
 	}
