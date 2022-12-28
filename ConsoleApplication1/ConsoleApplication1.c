@@ -22,7 +22,7 @@ int found_max(float maxes[], int number);
 void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE],int places[PLACES]);
 float average(int size, float scores[SIZE][LEN_SCORE]);
 int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE], char original_names[SIZE][LEN_NAME], float original_scores[SIZE][LEN_SCORE], char name[LEN_NAME]);
-int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]);
+int minimum(int size, float scores[SIZE][LEN_SCORE]);
 float local_minimum(float scores[]);
 int main()
 {
@@ -55,7 +55,7 @@ int main()
 			sort(SIZE, names, scores);
 			is_sorted += 1;
 		}
-		printf("Толкание ядра\n");
+		printf("Румянцев БИСТ-224 Толкание ядра\n");
 		printf("\nВот что может программа:\n1)Вывести изначальную таблицу\n2)Вывести таблицу результатов,отсортированную по первым 3-м попыткам;\n3)Вывести список победителей;\n4)Вывести выбывших игроков\n5)Показать средний арифметический результат\n6)Изменить значения у одного из спортсменов\n7)Очистить консоль\n8)Показать наихудший среди всех результат\n9)Выйти из программы\n");
 
 		scanf_s("%d", &what_do);
@@ -119,7 +119,7 @@ int main()
 		case 7: system("cls"); puts("Очистка прошла успешно!"); break;
 		case 8: {
 			int lowest;
-			lowest = minimum(SIZE, names, scores);
+			lowest = minimum(SIZE,scores);
 			printf("Наихудший результат принадлежит игроку %s под индексом %d\nОн равен: %5.2f\n\n",names[lowest],lowest,local_minimum(scores[lowest]));
 			break;
 		}
@@ -299,19 +299,19 @@ int reduct(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE], 
 				printf("\n");
 				scores[i][value] = new_value;
 			}
-			sort(SIZE, names, scores);
+			sort(size, names, scores);
 			return 1;
 		}
 			
 	}
 	return 0;
 }
-int minimum(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]) {
+int minimum(int size, float scores[SIZE][LEN_SCORE]) {
 	int min_index;
 	float minimum = scores[0][0];
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < LEN_SCORE; j++) {
-			if (scores[i][j] < minimum) {
+			if ((scores[i][j] < minimum) && (scores[i][j] != 0)) {
 				minimum = scores[i][j];
 				min_index = i;
 			}
