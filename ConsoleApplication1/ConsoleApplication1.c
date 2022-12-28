@@ -77,7 +77,7 @@ int main()
 		case 3: {
 			int places[PLACES];
 			winners(SIZE, names, scores  ,places);
-			printf("Победители, при поиске в изначальном массиве:\n\n");
+			printf("Победители, при поиске в  массиве:\n\n");
 			for (int i = 0; i < PLACES; i++) {
 				printf("%d место: %s с индексом %d и наибольшим значением %5.2f\n\n", i+1, names[places[i]],places[i], local_maximum(scores[places[i]],6));
 			}
