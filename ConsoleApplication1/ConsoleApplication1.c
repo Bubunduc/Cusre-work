@@ -259,7 +259,7 @@ void winners(int size, char names[SIZE][LEN_NAME], float scores[SIZE][LEN_SCORE]
 	maximums = (float*)malloc(size * sizeof(float));
 	float winners_score[3];
 	int winner_index[3];
-	for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < size; i++) {
 		maximums[i] = local_maximum(scores[i], LAST_RESULT);
 	}
 	
